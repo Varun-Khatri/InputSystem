@@ -89,5 +89,6 @@ namespace VK.Input
         {
             _movementInput = context.ReadValue<Vector2>();
         }
+
     }
 }
