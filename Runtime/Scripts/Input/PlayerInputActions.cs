@@ -1072,11 +1072,33 @@ namespace VK.Input
                 },
                 {
                     ""name"": """",
+                    ""id"": ""fffcd8dc-6ced-49c2-83a8-0bc050d16e69"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""PrimaryContact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""d7d47114-d2cf-457d-82b3-45a7ca704e94"",
                     ""path"": ""<Touchscreen>/primaryTouch/position"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
+                    ""action"": ""PrimaryPosition"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7f0b6bdb-e697-443c-a1c4-08e4f8020e3a"",
+                    ""path"": ""<Mouse>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""PrimaryPosition"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
