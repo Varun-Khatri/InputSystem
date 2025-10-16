@@ -62,12 +62,6 @@ After installation, access samples at Assets/Packages/[System Name]/Samples/
 | `TouchTest` | Example implementation demonstrating touch events |
 | `PlayerInputActions` | Generated Input System asset (not included) |
 
-## 📦 Installation
-
-1. **Prerequisites**: Unity 2019.4+ with Input System package
-2. **Setup Input Actions**: Create `PlayerInputActions` asset using Input System
-3. **Add InputHandler** to your player or game manager GameObject
-
 ## 🚀 Quick Start
 
 ### Basic Setup
@@ -334,4 +328,5 @@ This system is part of my professional portfolio. Feel free to:
 - Use in your personal or commercial projects
 - Extend with additional input types
 - Adapt for your specific control schemes
+
 
