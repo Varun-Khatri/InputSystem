@@ -6,11 +6,13 @@ namespace VK.Input
 {
     public class InputHandler : MonoBehaviour
     {
-        [Header("Touch Settings")]
-        [SerializeField] private float _swipeMinDistance = 50f;
+        [Header("Touch Settings")] [SerializeField]
+        private float _swipeMinDistance = 50f;
+
         [SerializeField] private float _swipeMaxDuration = 0.3f;
         private PlayerInputActions _actions;
         private Vector2 _movementInput = new();
+        private Vector2 _lookInput = new();
         private Vector2 _touchStartPosition = new();
         private Vector2 _currentDragPosition = new();
         private Vector2 _previousDragPosition = new();
@@ -31,6 +33,7 @@ namespace VK.Input
         private bool _touchPressedThisFrame = false;
         private bool _touchReleasedThisFrame = false;
         public Vector2 MovementInput => _movementInput;
+        public Vector2 LookInput => _lookInput;
         public Vector2 DragDelta => _currentDragPosition - _previousDragPosition;
         public Vector2 DragDirection => (_currentDragPosition - _previousDragPosition).normalized;
         public bool InteractPressedThisFrame => _interactPressedThisFrame;
@@ -57,7 +60,7 @@ namespace VK.Input
         public event Action OnCrouchReleased;
         public event Action OnInteractPressed;
         public event Action OnInteractReleased;
-        public event Action<Vector2> OnTouchPressed;  // Fires on initial touch
+        public event Action<Vector2> OnTouchPressed; // Fires on initial touch
         public event Action<Vector2> OnTouchReleased; // Fires on release
         public event Action<Vector2> OnTap;
         public event Action<Vector2> OnSwipe;
@@ -71,19 +74,29 @@ namespace VK.Input
 
         private void OnEnable()
         {
-            _actions.Player.Crouch.performed += context => OnButtonPerformedOrCanceled(ref _holdingCrouch, ref _crouchPressedThisFrame, ref _crouchReleasedThisFrame, OnCrouchPressed, context);
-            _actions.Player.Crouch.canceled += context => OnButtonPerformedOrCanceled(ref _holdingCrouch, ref _crouchPressedThisFrame, ref _crouchReleasedThisFrame, OnCrouchReleased, context);
-            _actions.Player.Interact.performed += context => OnButtonPerformedOrCanceled(ref _holdingInteract, ref _interactPressedThisFrame, ref _interactReleasedThisFrame, OnInteractPressed, context);
-            _actions.Player.Interact.canceled += context => OnButtonPerformedOrCanceled(ref _holdingInteract, ref _interactPressedThisFrame, ref _interactReleasedThisFrame, OnInteractReleased, context);
-            _actions.Player.Jump.performed += context => OnButtonPerformedOrCanceled(ref _holdingJump, ref _jumpPressedThisFrame, ref _jumpReleasedThisFrame, OnJumpPressed, context);
-            _actions.Player.Jump.canceled += context => OnButtonPerformedOrCanceled(ref _holdingJump, ref _jumpPressedThisFrame, ref _jumpReleasedThisFrame, OnJumpReleased, context);
-            _actions.Player.Dash.performed += context => OnButtonPerformedOrCanceled(ref _holdingDash, ref _dashPressedThisFrame, ref _dashReleasedThisFrame, OnDashPressed, context);
-            _actions.Player.Dash.canceled += context => OnButtonPerformedOrCanceled(ref _holdingDash, ref _dashPressedThisFrame, ref _dashReleasedThisFrame, OnDashReleased, context);
+            _actions.Player.Crouch.performed += context => OnButtonPerformedOrCanceled(ref _holdingCrouch,
+                ref _crouchPressedThisFrame, ref _crouchReleasedThisFrame, OnCrouchPressed, context);
+            _actions.Player.Crouch.canceled += context => OnButtonPerformedOrCanceled(ref _holdingCrouch,
+                ref _crouchPressedThisFrame, ref _crouchReleasedThisFrame, OnCrouchReleased, context);
+            _actions.Player.Interact.performed += context => OnButtonPerformedOrCanceled(ref _holdingInteract,
+                ref _interactPressedThisFrame, ref _interactReleasedThisFrame, OnInteractPressed, context);
+            _actions.Player.Interact.canceled += context => OnButtonPerformedOrCanceled(ref _holdingInteract,
+                ref _interactPressedThisFrame, ref _interactReleasedThisFrame, OnInteractReleased, context);
+            _actions.Player.Jump.performed += context => OnButtonPerformedOrCanceled(ref _holdingJump,
+                ref _jumpPressedThisFrame, ref _jumpReleasedThisFrame, OnJumpPressed, context);
+            _actions.Player.Jump.canceled += context => OnButtonPerformedOrCanceled(ref _holdingJump,
+                ref _jumpPressedThisFrame, ref _jumpReleasedThisFrame, OnJumpReleased, context);
+            _actions.Player.Dash.performed += context => OnButtonPerformedOrCanceled(ref _holdingDash,
+                ref _dashPressedThisFrame, ref _dashReleasedThisFrame, OnDashPressed, context);
+            _actions.Player.Dash.canceled += context => OnButtonPerformedOrCanceled(ref _holdingDash,
+                ref _dashPressedThisFrame, ref _dashReleasedThisFrame, OnDashReleased, context);
             _actions.Player.Move.performed += OnMove;
             _actions.Player.Move.canceled += OnMove;
+            _actions.Player.Look.performed += OnLook;
+            _actions.Player.Look.canceled += OnLook;
             _actions.Touch.PrimaryContact.performed += context =>
-             {
-                 OnButtonPerformedOrCanceled(
+            {
+                OnButtonPerformedOrCanceled(
                     ref _holdingTouch,
                     ref _touchPressedThisFrame,
                     ref _touchReleasedThisFrame,
@@ -101,7 +114,7 @@ namespace VK.Input
                     },
                     context
                 );
-             };
+            };
 
             _actions.Touch.PrimaryContact.canceled += context =>
             {
@@ -154,16 +167,26 @@ namespace VK.Input
 
         private void OnDisable()
         {
-            _actions.Player.Crouch.performed -= context => OnButtonPerformedOrCanceled(ref _holdingCrouch, ref _crouchPressedThisFrame, ref _crouchReleasedThisFrame, OnCrouchPressed, context);
-            _actions.Player.Crouch.canceled -= context => OnButtonPerformedOrCanceled(ref _holdingCrouch, ref _crouchPressedThisFrame, ref _crouchReleasedThisFrame, OnCrouchReleased, context);
-            _actions.Player.Interact.performed -= context => OnButtonPerformedOrCanceled(ref _holdingInteract, ref _interactPressedThisFrame, ref _interactReleasedThisFrame, OnInteractPressed, context);
-            _actions.Player.Interact.canceled -= context => OnButtonPerformedOrCanceled(ref _holdingInteract, ref _interactPressedThisFrame, ref _interactReleasedThisFrame, OnInteractReleased, context);
-            _actions.Player.Jump.performed -= context => OnButtonPerformedOrCanceled(ref _holdingJump, ref _jumpPressedThisFrame, ref _jumpReleasedThisFrame, OnJumpPressed, context);
-            _actions.Player.Jump.canceled -= context => OnButtonPerformedOrCanceled(ref _holdingJump, ref _jumpPressedThisFrame, ref _jumpReleasedThisFrame, OnJumpReleased, context);
-            _actions.Player.Dash.performed -= context => OnButtonPerformedOrCanceled(ref _holdingDash, ref _dashPressedThisFrame, ref _dashReleasedThisFrame, OnDashPressed, context);
-            _actions.Player.Dash.canceled -= context => OnButtonPerformedOrCanceled(ref _holdingDash, ref _dashPressedThisFrame, ref _dashReleasedThisFrame, OnDashReleased, context);
+            _actions.Player.Crouch.performed -= context => OnButtonPerformedOrCanceled(ref _holdingCrouch,
+                ref _crouchPressedThisFrame, ref _crouchReleasedThisFrame, OnCrouchPressed, context);
+            _actions.Player.Crouch.canceled -= context => OnButtonPerformedOrCanceled(ref _holdingCrouch,
+                ref _crouchPressedThisFrame, ref _crouchReleasedThisFrame, OnCrouchReleased, context);
+            _actions.Player.Interact.performed -= context => OnButtonPerformedOrCanceled(ref _holdingInteract,
+                ref _interactPressedThisFrame, ref _interactReleasedThisFrame, OnInteractPressed, context);
+            _actions.Player.Interact.canceled -= context => OnButtonPerformedOrCanceled(ref _holdingInteract,
+                ref _interactPressedThisFrame, ref _interactReleasedThisFrame, OnInteractReleased, context);
+            _actions.Player.Jump.performed -= context => OnButtonPerformedOrCanceled(ref _holdingJump,
+                ref _jumpPressedThisFrame, ref _jumpReleasedThisFrame, OnJumpPressed, context);
+            _actions.Player.Jump.canceled -= context => OnButtonPerformedOrCanceled(ref _holdingJump,
+                ref _jumpPressedThisFrame, ref _jumpReleasedThisFrame, OnJumpReleased, context);
+            _actions.Player.Dash.performed -= context => OnButtonPerformedOrCanceled(ref _holdingDash,
+                ref _dashPressedThisFrame, ref _dashReleasedThisFrame, OnDashPressed, context);
+            _actions.Player.Dash.canceled -= context => OnButtonPerformedOrCanceled(ref _holdingDash,
+                ref _dashPressedThisFrame, ref _dashReleasedThisFrame, OnDashReleased, context);
             _actions.Player.Move.performed -= OnMove;
             _actions.Player.Move.canceled -= OnMove;
+            _actions.Player.Look.performed -= OnLook;
+            _actions.Player.Look.canceled -= OnLook;
             _actions.Touch.PrimaryContact.performed -= context =>
             {
                 OnButtonPerformedOrCanceled(
@@ -235,7 +258,8 @@ namespace VK.Input
             _actions.Touch.PrimaryPosition.performed -= OnTouchMoved;
         }
 
-        private void OnButtonPerformedOrCanceled(ref bool holdingButton, ref bool buttonPressedThisFrame, ref bool buttonReleasedThisFrame, Action action, InputAction.CallbackContext context)
+        private void OnButtonPerformedOrCanceled(ref bool holdingButton, ref bool buttonPressedThisFrame,
+            ref bool buttonReleasedThisFrame, Action action, InputAction.CallbackContext context)
         {
             var val = context.ReadValue<float>();
             buttonPressedThisFrame = val == 1 && !holdingButton;
@@ -247,6 +271,11 @@ namespace VK.Input
         private void OnMove(InputAction.CallbackContext context)
         {
             _movementInput = context.ReadValue<Vector2>();
+        }
+
+        private void OnLook(InputAction.CallbackContext context)
+        {
+            _lookInput = context.ReadValue<Vector2>();
         }
 
         private void OnTouchMoved(InputAction.CallbackContext context)
@@ -263,7 +292,5 @@ namespace VK.Input
                 _currentDragPosition - _previousDragPosition
             );
         }
-
-
     }
 }
